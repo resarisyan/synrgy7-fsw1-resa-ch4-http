@@ -23,7 +23,8 @@ const savePeople = async (value) => {
 const getAllPeopleByKey = async (key) => {
   try {
     const data = await fs.readFile('./data/result.json', 'utf8');
-    const getKeys = JSON.parse(data).map((item) => item[key]);
+    const parsedData = JSON.parse(data);
+    const getKeys = parsedData.filter((item) => item.username === key);
     return getKeys;
   } catch (error) {
     console.error(error);
@@ -31,6 +32,20 @@ const getAllPeopleByKey = async (key) => {
   }
 };
 
+const searchPeople = async (key) => {
+  try {
+    const data = await fs.readFile('./data/result.json', 'utf8');
+    const parsedData = JSON.parse(data);
+    const search = key.trim().toLowerCase();
+    const filteredData = parsedData.filter((item) =>
+      item.username.toLowerCase().includes(search)
+    );
+    return filteredData;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
 const getAllPeople = async () => {
   try {
     const data = await fs.readFile('./data/result.json', 'utf8');
@@ -52,4 +67,23 @@ const getPeopleById = async (id) => {
   }
 };
 
-export { savePeople, getAllPeopleByKey, getAllPeople, initialPeople, getPeopleById };
+const deletePeopleById = async (id) => {
+  try {
+    const data = await getAllPeople();
+    const newData = data.filter((item) => item.id !== id);
+    await fs.writeFile('./data/result.json', JSON.stringify(newData), 'utf8');
+    console.log('Data has been deleted successfully');
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export {
+  savePeople,
+  getAllPeople,
+  initialPeople,
+  getPeopleById,
+  deletePeopleById,
+  getAllPeopleByKey,
+  searchPeople,
+};
